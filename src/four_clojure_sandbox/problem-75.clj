@@ -26,13 +26,17 @@
 (count (euler-totient 40))
 (count (euler-totient 99))
 
-(def __ euler-totient)
+(set (for [i (range 10) :when (odd? i)] i))
 
+(let [n 10]
+  (keep #(if (zero? (mod n %)) % nil) (range 1 (inc n))))
 
+;    (let [divisor (fn [n] (set (for [x (range 1 (inc n)) :when (zero?
+                                        ;    (mod n x))] x)))
 ;; Solution is:
 (def ^{ :private true } __
   (fn [n]
-    (let [divisor (fn [n] (set (for [x (range 1 (inc n)) :when (zero? (mod n x))] x)))
+    (let [divisor (fn [n] (set (keep #(if (zero? (mod n %)) % nil) (range 1 (inc n)))))
           coprime? (fn [a b] (= #{1} (clojure.set/intersection (divisor a) (divisor b))))]
       (if
           (= n 1)
