@@ -19,8 +19,8 @@
 
 (defn- pronounce* [s] (iterate pronounce (pronounce s)))
 
-(take 3 (pronounce* [1]))
-
+(take 5 (pronounce* [1]))
+(take 10 (pronounce* [1]))
 (def ^{:private true} __ pronounce*)
 
 ;;Solution is"
