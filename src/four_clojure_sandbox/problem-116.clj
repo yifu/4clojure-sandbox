@@ -27,8 +27,6 @@
             b (+ n x)
             p-a (prime-p a)
             p-b (prime-p b)]
-;;        do
-;;        (prn a "|" b "|" (and p-a p-b) "|" (or p-a p-b))
         (comment (if (and p-a p-b)
                    true
                    (if (not (or p-a p-b))
@@ -36,6 +34,16 @@
                      false)))
         (or (and p-a p-b) (and (not p-a) (not p-b) (recur (inc x))))))
     false))
+
+;; Solution is:
+(def ^{:private true} __ (fn [n]
+                           (let [p (fn [n] (if (> n 1) (not-any? zero? (for [x (range 2 n)] (mod n x)))))]
+                               (if (p n)
+                                 (loop [x 1]
+                                   (let [c (p (- n x))
+                                         d (p (+ n x))]
+                                     (or (and c d) (and (not c) (not d) (recur (inc x))))))
+                                 false))))
 
 (= nil false)
 (prime-p 1)
