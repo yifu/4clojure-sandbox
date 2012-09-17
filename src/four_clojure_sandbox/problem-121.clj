@@ -60,8 +60,6 @@
 (let [s '{a 16 b 8}] (eval (list 'let (vector (array-map :syms '[a b]) '(quote {a 16 b 8}) ) '[a b] )))
 (let [s '{a 16 b 8}] (eval (list 'let (vector (array-map :syms '[a b]) '(quote s) ) '[a b] )))
 
-;; HERE !!!!
-(eval (let [s '{a 16 b 8}] (list 'let (vector (array-map :syms '[a b]) (list 'quote s)) '(/ a b))))
 
 (eval (list 'let (vector 'a 16 'b 8) '[a b]))
 (let [{:syms [a b]} '{a 16, b 8}] [a b])
@@ -70,6 +68,27 @@
 (vector 1 2 3)
 (doc map )
 
+;; HERE !!!!
+(eval (let [s '{a 16 b 8}] (list 'let (vector (array-map :syms '[a b]) (list 'quote s)) '(/ a b))))
+
+((fn [body] (eval (let [s '{a 16 b 8}] (list 'let (vector (array-map :syms '[a b]) (list 'quote s)) body)))) '(/ a b))
+
+((fn [bindings]
+   ((fn [body]
+      (eval (let [s bindings] (list 'let (vector (array-map :syms '[a b x y]) (list 'quote s)) body))))
+    '(/ a b)))
+ '{a 16 b 8})
+
+(defn- compute [body]
+  (fn [bindings]
+    (eval (let [s bindings] (list 'let (vector (array-map :syms '[a b x y]) (list 'quote s)) body)))))
+
+((compute '(/ a b)) '{a 16 b 8} )
+
+(def ^{:private true} __ compute)
+
+;; Solution is :
+(((fn [b] (fn [s] (eval (list 'let (vector (array-map :syms '[a b x y]) (list 'quote s)) b)))) '(/ a b)) '{a 16 b 8})
 
 (and (= 2 ((__ '(/ a b))
            '{b 8 a 16}))
