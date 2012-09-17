@@ -26,6 +26,50 @@
 (1 2 (3 4))
 
 (list 'let '[ 'a 16 'b 8 '] '(/ a b) )
+(list 'let '[ a 16 b 8 ] '(/ a b) )
+(list 'let `[ ~@(list 'a 16 'b 8) ] '(/ a b) )
+((fn [s]
+   (let [keys (keys s)
+         {:syms (keys s)} s]
+     (list 'let `[ ~@(list 'a ,a 'b ,b) ] '(/ a b) ))) '{a 16 b 8})
+
+((fn [s]
+   (let [keys (keys s)
+         {:syms (keys s)} s]
+     (/ a b))) '{a 16 b 8})
+
+(keys '{a 16 b 3})
+
+((fn [b]
+   (let [s (vec (keys b))
+         {:syms [a b x y]} b]
+     (/ a b))) '{a 16 b 8})
+
+(((fn [body]
+    (fn [bindings]
+      (eval (list 'let `[{:syms [a b ]} '{a 16 b 8}] body))
+      ))
+  '(/ a b))
+ '{a 16 b 8})
+
+
+(eval (list 'let `[{:syms [a b ]} '{a 16 b 8}] '(/ a b)))
+
+(let [s '{a 16 b 8}] (eval '(let [{:syms [a b]} ~s] [a b])))
+
+(let [s '{a 16 b 8}] (eval (list 'let (vector (array-map :syms '[a b]) '(quote {a 16 b 8}) ) '[a b] )))
+(let [s '{a 16 b 8}] (eval (list 'let (vector (array-map :syms '[a b]) '(quote s) ) '[a b] )))
+
+;; HERE !!!!
+(eval (let [s '{a 16 b 8}] (list 'let (vector (array-map :syms '[a b]) (list 'quote s)) '(/ a b))))
+
+(eval (list 'let (vector 'a 16 'b 8) '[a b]))
+(let [{:syms [a b]} '{a 16, b 8}] [a b])
+(array-map :syms [a b])
+
+(vector 1 2 3)
+(doc map )
+
 
 (and (= 2 ((__ '(/ a b))
            '{b 8 a 16}))
