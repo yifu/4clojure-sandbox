@@ -89,6 +89,50 @@
 
 ;; Solution is :
 (((fn [b] (fn [s] (eval (list 'let (vector (array-map :syms '[a b x y]) (list 'quote s)) b)))) '(/ a b)) '{a 16 b 8})
+;; Using eval is not a solution..
+
+(defn- eval-form
+  ([n] n)
+  ([op arg1 arg2] (apply op (eval-form arg1) (eval-form arg2))))
+
+(defn- get-fn [s]
+  ({'+ + '/ / '* * '- -} s))
+
+(defn- eval-form
+  ([n] (if (symbol? n) (fn [bindings] (bindings n)) (fn [bindings] n)))
+  ([op & args] (fn [bindings] (apply ({'+ + '/ / '* * '- -} op) (map #(% bindings) (map eval-form args))))))
+
+
+(defn- eval-form
+  ([n] (if (symbol? n) (fn [b] (b n)) (fn [b] n)))
+  ([o & a] (fn [b] (apply ({'+ + '/ / '* * '- -} o) ((apply juxt (map #(apply eval-form %) a)) b)))))
+
+
+(defn- eval-form [f]
+  (if (list? f)
+    (fn [b] (apply ({'+ + '/ / '* * '- -} (first f)) ((apply juxt (map eval-form (rest f))) b)))
+    (if (symbol? f) (fn [b] (b f)) (fn [b] f))))
+
+((eval-form '(/ a b)) '{a 16 b 8})
+
+(map #(apply prn %) '(/ a b))
+
+(def ^{:private true} __  eval-form )
+
+((__ '(* (+ 2 a) (- 10 b))) '{a 1 b 8})
+
+;;Solution is:
+(defn- e [f]
+  (if (list? f)
+    (fn [b] (apply ({'+ + '/ / '* * '- -} (first f)) ((apply juxt (map e (rest f))) b)))
+    (if (symbol? f) (fn [b] (b f)) (fn [b] f))))
+
+(def ^{:private true} __
+  (fn e [f]
+    (if (list? f)
+      (fn [b] (apply ({'+ + '/ / '* * '- -} (first f)) ((apply juxt (map e (rest f))) b)))
+      (if (symbol? f) (fn [b] (b f)) (fn [b] f)))))
+
 
 (and (= 2 ((__ '(/ a b))
            '{b 8 a 16}))
