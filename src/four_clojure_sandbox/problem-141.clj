@@ -91,12 +91,12 @@
 
 (defn- tricky-cg [s]
   (fn [[l & _ :as t]]
-    (let [a :suit g (group-by a t)]
-      (apply max-key :rank (get g s ((a l) g))))))
+    (let [k :suit g (group-by k t)]
+      (apply max-key :rank (get g s ((k l) g))))))
 
 #(fn [[l & _ :as t]]
-   (let [a :suit g (group-by a t)]
-     (apply max-key :rank (get g % ((a l) g)))))
+   (let [k :suit g (group-by k t)]
+     (apply max-key :rank (get g % ((k l) g)))))
 
 (def __ tricky-cg)
 
