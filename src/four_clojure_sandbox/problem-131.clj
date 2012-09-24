@@ -3,16 +3,10 @@
   (set (for [x s y s] (+ x y))))
 
 (defn- equi-sum [& r]
-  (do
-    (prn r)
-    (not (empty?
-          (apply clojure.set/intersection
-                 (for [s r] (do (prn s (sums s)) (sums s))))))))
-
-(defn- equi-sum [& r]
-  (every?
-   true?
-   (for [x r y r] (not (empty? (clojure.set/intersection (sums x) (sums y)))))))
+  (let [s (fn [s] (set (for [x s y s] (+ x y))))]
+   (every?
+    #(not (empty? %))
+    (for [x r y r] (clojure.set/intersection (s x) (s y))))))
 
 (equi-sum #{-1 1 99}
           #{-2 2 888}
