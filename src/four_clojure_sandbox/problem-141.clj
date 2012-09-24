@@ -28,16 +28,29 @@
      (if (= 0 (:rank t))
        u t))))
 
-(defn- tricky-cg [trump-suit]
-  (fn [[ lead & _ :as tricks]]
-    (let [w (fn [lead] (reduce #(if (= (:suit %) (:suit %2))
+(defn- tricky-cg [s]
+  (fn [[ l & _ :as t]]
+    (let [w (fn [l] (reduce #(if (= (:suit %) (:suit %2))
                                   (if (< (:rank %) (:rank %2))
                                     %2
                                     %)
-                                  %) lead tricks))]
-      (let [t (w {:suit trump-suit :rank 0})
-            u (w lead)]
-        (if (= 0 (:rank t)) u t)))))
+                                  %) l t))
+          t (w {:suit s :rank 0})]
+      (if (= 0 (:rank t)) (w l) t))))
+
+
+
+(defn- tricky-cg [s]
+  (let [a :suit b :rank]
+    (fn [[ l & _ :as t]]
+      (let [w (fn [l] (reduce #(if (= (a %) (a %2))
+                                 (if (< (b %) (b %2))
+                                   %2
+                                   %)
+                                 %) l t))
+            t (w {a s b 0})]
+        (if (= 0 (b t)) (w l) t)))))
+
 
 (def __ tricky-cg)
 
