@@ -51,6 +51,52 @@
             t (w {a s b 0})]
         (if (= 0 (b t)) (w l) t)))))
 
+;; IMPROVED SOLUTION:
+
+(let [lead {:suit :heart :rank 2}
+      trump-suit :club
+      trump {:suit trump-suit :rank 0 }
+      
+      tricks  [{:suit :heart :rank 2}
+               {:suit :spade :rank 10}
+               {:suit :heart :rank 4}
+               {:suit :heart :rank 3}
+               {:suit :spade :rank 3}
+               {:suit :club :rank 1}]]
+  (let [w (fn [s] (last (sort-by :rank (filter #(= (:suit %) s) tricks))))]
+   (if-let [r (w trump-suit)]
+     r
+     (w (:suit lead)))))
+
+(defn- tricky-cg [s]
+  (fn [[l & _ :as t]]
+    (let [w (fn [s] (last (sort-by :rank (filter #(= (:suit %) s) t))))]
+      (if (w s)
+        (w s)
+        (w (:suit l))))))
+
+;; EVEN MORE IMPROVED:
+
+(let [lead {:suit :heart :rank 2}
+      trump-suit :spade
+      trump {:suit nil :rank 0 }
+      tricks  [{:suit :heart :rank 2}
+               {:suit :spade :rank 10}
+               {:suit :heart :rank 4}
+               {:suit :heart :rank 3}
+               {:suit :spade :rank 3}
+               {:suit :club :rank 1}]]
+  (let [g (group-by :suit tricks)]
+    (apply max-key :rank (get g trump-suit ((:suit lead) g)))))
+
+(defn- tricky-cg [s]
+  (fn [[l & _ :as t]]
+    (let [a :suit g (group-by a t)]
+      (apply max-key :rank (get g s ((a l) g))))))
+
+#(fn [[l & _ :as t]]
+   (let [a :suit g (group-by a t)]
+     (apply max-key :rank (get g % ((a l) g)))))
 
 (def __ tricky-cg)
 
