@@ -1,4 +1,4 @@
-
+ 
 (defn- c [i [r & s]]
   (if r
     (+ (r i) 
